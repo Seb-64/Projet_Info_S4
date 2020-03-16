@@ -267,7 +267,7 @@ namespace Projet_Info_S4
 
                 }
             }
-            //une fois le coef chosie, on suit le même protocole que pour l'agrandissement
+            //une fois le coef choisi, on suit le même protocole que pour l'agrandissement
 
             Pixel[,] imageRetreci = new Pixel[this.hauteur / coef, this.largeur / coef];
 
@@ -330,6 +330,98 @@ namespace Projet_Info_S4
                     t += 3;
                 }
             }*/
+        }
+        public void Convolution()
+        {
+
+            int choix = 0;
+            while (choix < 1 || choix > 4)
+            {
+                Console.WriteLine("Vous voulez: " + "\n (1) Détection de contours" + "\n (2) Renforcement des bords" + "\n (3) Appliquer un flou" + "\n (4) Repoussage");
+                choix = Convert.ToInt32(Console.ReadLine());
+            }
+
+            int[,] matconvolution = new int[3, 3];
+            Pixel[,] matricefinale = new Pixel[this.hauteur, this.largeur];
+
+            if (choix == 1)
+            {
+
+            }   //initialisation matrice de convolution en fonction du choix de traitement de l'utilisateur 
+            if (choix == 2)
+            {
+                int[,] tab = { { 0, 0, 0 }, { -1, 1, 0 }, { 0, 0, 0 } };
+                matconvolution = tab;
+            }
+            if (choix == 3)
+            {
+                for (int l = 0; l < matconvolution.GetLength(0); l++)
+                {
+                    for (int c = 0; c < matconvolution.GetLength(1); c++)
+                    {
+                        matconvolution[l, c] = 1;
+                    }
+                }
+            }
+            if (choix == 4)
+            {
+                int[,] tab = { { 0, 1, 0 }, { 1, -4, 1 }, { 0, 1, 0 } };
+                matconvolution = tab;
+            }
+
+            int diviseur = 0;
+            for (int l = 0; l < matconvolution.GetLength(0); l++)
+            {
+                for (int c = 0; c < matconvolution.GetLength(1); c++)             //DIVISEUR
+                {
+                    diviseur += matconvolution[l, c];
+                }
+            }
+            if (diviseur == 0) diviseur = 1;
+
+
+            int l3 = 0;
+            int c3 = 0;
+            int sommebyteR = 0;
+            int sommebyteG = 0;
+            int sommebyteB = 0;
+            for (int l = 0; l < matricefinale.GetLength(0); l++)
+            {
+                for (int c = 0; c < matricefinale.GetLength(1); c++)
+                {
+                    for (int l1 = l - 1; l1 <= l + 1; l1++)
+                    {
+                        for (int c1 = c - 1; c1 <= c + 1; c1++)
+                        {
+                            if (l1 != -1 && l1 != image.GetLength(0) && c1 != -1 && c1 != image.GetLength(1))
+                            {
+                                sommebyteR += (Convert.ToInt32(this.image[l1, c1].R) * matconvolution[l3, c3]);
+                                sommebyteG += (Convert.ToInt32(this.image[l1, c1].G) * matconvolution[l3, c3]);
+                                sommebyteB += (Convert.ToInt32(this.image[l1, c1].B) * matconvolution[l3, c3]);
+
+                            }
+                            c3++;
+                        }
+                        c3 = 0;
+                        l3++;
+                    }
+                    l3 = 0;
+                    sommebyteR /= (diviseur);
+                    sommebyteG /= (diviseur);
+                    sommebyteB /= (diviseur);
+                    if (sommebyteR > 255) sommebyteR = 255; if (sommebyteG > 255) sommebyteG = 255; if (sommebyteB > 255) sommebyteB = 255;
+                    if (sommebyteR < 0) sommebyteR = 0; if (sommebyteG < 0) sommebyteG = 0; if (sommebyteB < 0) sommebyteB = 0;                             //normalisation
+
+                    matricefinale[l, c] = new Pixel(Convert.ToByte(sommebyteR), Convert.ToByte(sommebyteG), Convert.ToByte(sommebyteB));        //création du nouveau pixel grâce à la matrice de convolution 
+
+                    sommebyteR = (byte)0;
+                    sommebyteG = (byte)0;
+                    sommebyteG = (byte)0;
+                }
+            }
+
+            this.image = matricefinale;
+
         }
     }
 }

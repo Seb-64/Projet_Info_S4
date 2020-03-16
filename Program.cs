@@ -40,7 +40,7 @@ namespace Projet_Info_S4
               }*/
             MyImage lac = new MyImage("Image\\lena.bmp");
             Process.Start("Image\\lena.bmp");
-            lac.Retrecissement();
+            lac.Convolution();
             lac.From_Image_To_File();
             Process.Start("Image\\copie_lena.bmp");
             Console.ReadKey();
