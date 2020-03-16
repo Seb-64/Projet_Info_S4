@@ -331,25 +331,29 @@ namespace Projet_Info_S4
                 }
             }*/
         }
+        /// <summary>
+        /// Matrice de convolution qui applique plusieurs filtre à une image
+        /// Filtres : détection des contours/Renforcement des bords/Flou/Repoussage/Augmenter le contraste
+        /// Diviseur : pour chaque filtre, il y a une matrice de convolution 3x3 correspondante. Le diviseur du filtre est la somme des éléments de cette matrice
+        /// Application : pour chaque pixel, on prend la matrice 3x3 de pixel autour de celui selectionné, puis on la multiplie élément par élément et on fait la somme. Enfin, on divise cette somme par le diviseur qui va coder le nouveau pixel
+        /// Résultat : finalement, on attribut à chaque pixel son pixel filtré dans une nouvelle matrice de byte qu'on associe avec la nouvelle image créée
+        /// </summary>
         public void Convolution()
         {
-
             int choix = 0;
             while (choix < 1 || choix > 5)
             {
                 Console.WriteLine("Vous voulez: " + "\n (1) Détection des contours" + "\n (2) Renforcement des bords" + "\n (3) Appliquer un flou" + "\n (4) Repoussage" + "\n (5) Augmenter le contraste");
                 choix = Convert.ToInt32(Console.ReadLine());
             }
-
             int[,] matconvolution = new int[3, 3];
             Pixel[,] matricefinale = new Pixel[this.hauteur, this.largeur];
-
             if (choix == 1)
             {
                 int[,] tab = { { 0, 1, 0 }, { 1, -4, 1 }, { 0, 1, 0 } };
                 matconvolution = tab;
 
-            }   //initialisation matrice de convolution en fonction du choix de traitement de l'utilisateur 
+            }
             if (choix == 2)
             {
                 int[,] tab = { { 0, 0, 0 }, { -1, 1, 0 }, { 0, 0, 0 } };
@@ -379,7 +383,7 @@ namespace Projet_Info_S4
             int diviseur = 0;
             for (int l = 0; l < matconvolution.GetLength(0); l++)
             {
-                for (int c = 0; c < matconvolution.GetLength(1); c++)             //DIVISEUR
+                for (int c = 0; c < matconvolution.GetLength(1); c++)
                 {
                     diviseur += matconvolution[l, c];
                 }
@@ -425,9 +429,7 @@ namespace Projet_Info_S4
                     sommebyteB = 0;
                 }
             }
-
             this.image = matricefinale;
-
         }
     }
 }
