@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Projet_Info_S4", "Projet_In
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Projet_Info_S4_ProjetTestUnitaire", "..\Projet_Info_S4_ProjetTestUnitaire\Projet_Info_S4_ProjetTestUnitaire.csproj", "{BB652B4B-4808-4033-ACED-C256F2114855}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPF_PSI_S4", "..\WPF_PSI_S4\WPF_PSI_S4.csproj", "{9BA8C055-525B-4EE6-BF85-87D69E164B8E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{BB652B4B-4808-4033-ACED-C256F2114855}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB652B4B-4808-4033-ACED-C256F2114855}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB652B4B-4808-4033-ACED-C256F2114855}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BA8C055-525B-4EE6-BF85-87D69E164B8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BA8C055-525B-4EE6-BF85-87D69E164B8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BA8C055-525B-4EE6-BF85-87D69E164B8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BA8C055-525B-4EE6-BF85-87D69E164B8E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

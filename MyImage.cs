@@ -335,9 +335,9 @@ namespace Projet_Info_S4
         {
 
             int choix = 0;
-            while (choix < 1 || choix > 4)
+            while (choix < 1 || choix > 5)
             {
-                Console.WriteLine("Vous voulez: " + "\n (1) Détection de contours" + "\n (2) Renforcement des bords" + "\n (3) Appliquer un flou" + "\n (4) Repoussage");
+                Console.WriteLine("Vous voulez: " + "\n (1) Détection des contours" + "\n (2) Renforcement des bords" + "\n (3) Appliquer un flou" + "\n (4) Repoussage" + "\n (5) Augmenter le contraste");
                 choix = Convert.ToInt32(Console.ReadLine());
             }
 
@@ -346,6 +346,8 @@ namespace Projet_Info_S4
 
             if (choix == 1)
             {
+                int[,] tab = { { 0, 1, 0 }, { 1, -4, 1 }, { 0, 1, 0 } };
+                matconvolution = tab;
 
             }   //initialisation matrice de convolution en fonction du choix de traitement de l'utilisateur 
             if (choix == 2)
@@ -365,7 +367,12 @@ namespace Projet_Info_S4
             }
             if (choix == 4)
             {
-                int[,] tab = { { 0, 1, 0 }, { 1, -4, 1 }, { 0, 1, 0 } };
+                int[,] tab = { { -2, -1, 0 }, { -1, 1, 1 }, { 0, 1, 2 } };
+                matconvolution = tab;
+            }
+            if (choix == 5)
+            {
+                int[,] tab = { { 0, -1, 0 }, { -1, 5, -1 }, { 0, -1, 0 } };
                 matconvolution = tab;
             }
 
@@ -378,7 +385,6 @@ namespace Projet_Info_S4
                 }
             }
             if (diviseur == 0) diviseur = 1;
-
 
             int l3 = 0;
             int c3 = 0;
@@ -414,9 +420,9 @@ namespace Projet_Info_S4
 
                     matricefinale[l, c] = new Pixel(Convert.ToByte(sommebyteR), Convert.ToByte(sommebyteG), Convert.ToByte(sommebyteB));        //création du nouveau pixel grâce à la matrice de convolution 
 
-                    sommebyteR = (byte)0;
-                    sommebyteG = (byte)0;
-                    sommebyteG = (byte)0;
+                    sommebyteR = 0;
+                    sommebyteG = 0;
+                    sommebyteB = 0;
                 }
             }
 

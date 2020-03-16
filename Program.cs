@@ -38,12 +38,12 @@ namespace Projet_Info_S4
                   }
                   Console.WriteLine();
               }*/
-            MyImage lac = new MyImage("Image\\lena.bmp");
-            Process.Start("Image\\lena.bmp");
+            MyImage lac = new MyImage("Image\\lac.bmp");
+            Process.Start("Image\\lac.bmp");
             lac.Convolution();
             lac.From_Image_To_File();
-            Process.Start("Image\\copie_lena.bmp");
-            Console.ReadKey();
+            Process.Start("Image\\copie_lac.bmp");
+            //Console.ReadKey();
         }
         static void TestConvertionNB()
         {
