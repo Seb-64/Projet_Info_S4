@@ -198,9 +198,138 @@ namespace Projet_Info_S4
                 }
             }
         }
-        public void Rotation()
-        {
+        public void Agrandissement(int coef)
+        {    //coef d'agrandissement à choisir (chiffre rond)
+            Pixel[,] ImageAgrandie = new Pixel[this.hauteur * coef, this.largeur * coef];    //on crée une nouvelle matrice de pixel avec la taille souhaitée
 
+            int ll = 0;
+            int cc = 0;
+            for (int l = 0; l < ImageAgrandie.GetLength(0); l += coef)
+            {
+                for (int c = 0; c < ImageAgrandie.GetLength(1); c += coef)
+                {
+                    for (int m = 0; m < coef; m++)
+                    {
+                        for (int n = 0; n < coef; n++)
+                        {
+                            ImageAgrandie[l + m, c + n] = this.image[ll, cc];        //on initialise les pixels supplémentaires à la même valeur que le pixel original
+                        }
+
+                    }
+                    cc++;
+                }
+                cc = 0;
+                ll++;
+            }
+
+            this.hauteur = ImageAgrandie.GetLength(0);
+            this.largeur = ImageAgrandie.GetLength(1);
+
+            this.tailleFichier = ((this.hauteur * this.largeur * 3) + 56);  //on remet à jour la taille du fichier car elle a augmenté
+            this.image = ImageAgrandie;
+        }
+        public void Retrecissement()
+        {
+            int coef = 0;
+            int[] coefpossibles = new int[10];
+            int t = 0;
+            for (int i = 2; i < 11; i++)          //on  cherche seulement des coefs compris entre 2 et 10
+            {
+                if ((this.hauteur / i) % 4 == 0 && (this.largeur / i) % 4 == 0) //on test si la largeur et la hauteur est bien  multiple de 4 (nécessaire)
+                {
+                    coefpossibles[t] = i;               //fonction qui determine quels coeffiscients de retrécissement on peut utiliser
+                    t++;                                //car problèmes avec certains coef (largeur % 4 != 0 donc fichier bmp corrompu)
+                }
+            }
+
+            Console.WriteLine("Voici les différents coefficients de rétrecissement possible:");
+            for (int i = 0; i < 10; i++)
+            {
+                if (coefpossibles[i] != 0)
+                {
+                    Console.WriteLine(coefpossibles[i] + "; ");             //on propose à l'utilisateur quel coeffiscient il veut utiliser (!=0)
+                }
+
+            }
+
+            bool coefok = false;
+            while (!coefok)
+            {
+                Console.WriteLine("Veuillez choisir un coefficient valide puis valider svp.");
+                coef = Convert.ToInt32(Console.ReadLine());
+
+                for (int i = 0; i < coefpossibles.Length; i++)
+                {
+                    if (coefpossibles[i] == coef)
+                    {
+                        coefok = true;          //vérification si le coef entré par l'utilisateur est bien valide
+                    }
+
+                }
+            }
+            //une fois le coef chosie, on suit le même protocole que pour l'agrandissement
+
+            Pixel[,] imageRetreci = new Pixel[this.hauteur / coef, this.largeur / coef];
+
+            int ll = 0;
+            int cc = 0;
+            for (int l = 0; l < imageRetreci.GetLength(0); l++)
+            {
+                for (int c = 0; c < imageRetreci.GetLength(1); c++)
+                {
+                    imageRetreci[l, c] = this.image[ll, cc];                //Fonction qui rétrecie l'image en fonction du coef que l'utilisateur a rentré
+                    cc += coef;
+                }
+                cc = 0;
+                ll += coef;
+            }
+
+            this.hauteur = imageRetreci.GetLength(0);
+            this.largeur = imageRetreci.GetLength(1);
+
+            this.tailleFichier = ((this.hauteur * this.largeur * 3) + 56);
+            this.image = imageRetreci;
+
+        }
+        public void Rotation(int angle)
+        {
+            double teta = angle * Math.PI / 180;
+
+            int newLargeur = Convert.ToInt32(this.largeur * Math.Cos(teta) + this.hauteur * Math.Sin(teta));
+            int newHauteur = Convert.ToInt32(this.largeur * Math.Sin(teta) + this.hauteur * Math.Cos(teta));
+            int newTailleFichier = newHauteur * newLargeur;
+            byte[] fichier = new byte[newTailleFichier];
+            for (int i = 0; i < 54; i++)
+            {
+                fichier[i] = (byte)0; //on attribut tout d'abord une valeur aux header et header info
+            }
+
+            byte[] tabType = { Convert.ToByte(this.type[0]), Convert.ToByte(this.type[1]) };
+            fichier[0] = tabType[0]; fichier[1] = tabType[1];
+            byte[] tabTaille = Convertir_Int_To_Endian(newTailleFichier);
+            fichier[2] = tabTaille[0]; fichier[3] = tabTaille[1]; fichier[4] = tabTaille[2]; fichier[5] = tabTaille[3];
+            byte[] tabTailleOffset = Convertir_Int_To_Endian(this.tailleOffset);
+            fichier[10] = tabTailleOffset[0]; fichier[11] = tabTailleOffset[1]; fichier[12] = tabTailleOffset[2]; fichier[13] = tabTailleOffset[3];
+            fichier[14] = 40;
+            byte[] tabLargeur = Convertir_Int_To_Endian(newLargeur);
+            fichier[18] = tabLargeur[0]; fichier[19] = tabLargeur[1]; fichier[20] = tabLargeur[2]; fichier[21] = tabLargeur[3];
+            byte[] tabHauteur = Convertir_Int_To_Endian(newHauteur);
+            fichier[22] = tabHauteur[0]; fichier[23] = tabHauteur[1]; fichier[24] = tabHauteur[2]; fichier[25] = tabHauteur[3];
+            byte[] tabNbrBitCouleur = Convertir_Int_To_Endian(this.nbBitsCouleur);
+            fichier[28] = tabNbrBitCouleur[0]; fichier[29] = tabNbrBitCouleur[1];
+
+            int t = 54;
+            /*Pas encore trouvé comment faire tourner l'image
+            for (int l = 0; l < this.hauteur; l++)
+            {
+                for (int c = 0; c < this.largeur; c++)
+                {
+                    fichier[t CHANGEMENT] = this.image[l, c].R;    //on attribue les octets des pixel R, G et B à la matrice de byte
+                    fichier[t + 1 CHANGEMENT] = this.image[l, c].G;
+                    fichier[t + 2 CHANGEMENT] = this.image[l, c].B;
+                    t += 3;
+                }
+            }*/
         }
     }
 }
