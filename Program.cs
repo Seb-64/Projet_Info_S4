@@ -15,7 +15,6 @@ namespace Projet_Info_S4
     {
         static void Main()
         {
-                    bITE BITE BITRE BITE 
             /*  byte[] fichier = File.ReadAllBytes("Image\\ImageCopie.bmp");
 
             Console.WriteLine("\n Header \n");
