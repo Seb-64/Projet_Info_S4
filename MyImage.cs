@@ -145,7 +145,7 @@ namespace Projet_Info_S4
                     t += 3;
                 }
             }
-            string nouveauNom = this.nomFichier.Insert(6, "copie_");
+            string nouveauNom = this.nomFichier.Replace(".bmp", "_copie.bmp");
             File.WriteAllBytes(nouveauNom, fichier);
         }
         /// <summary>
@@ -341,9 +341,9 @@ namespace Projet_Info_S4
         public void Convolution()
         {
             int choix = 0;
-            while (choix < 1 || choix > 5)
+            while (choix < 1 || choix > 6)
             {
-                Console.WriteLine("Vous voulez: " + "\n (1) Détection des contours" + "\n (2) Renforcement des bords" + "\n (3) Appliquer un flou" + "\n (4) Repoussage" + "\n (5) Augmenter le contraste");
+                Console.WriteLine("Vous voulez: " + "\n (1) Détection des contours" + "\n (2) Renforcement des bords" + "\n (3) Appliquer un flou" + "\n (4) Flou Gaussien" + "\n (5) Repoussage" + "\n (6) Augmenter le contraste");
                 choix = Convert.ToInt32(Console.ReadLine());
             }
             int[,] matconvolution = new int[3, 3];
@@ -371,10 +371,15 @@ namespace Projet_Info_S4
             }
             if (choix == 4)
             {
-                int[,] tab = { { -2, -1, 0 }, { -1, 1, 1 }, { 0, 1, 2 } };
+                int[,] tab = { { 1, 2, 1 }, { 2, 4, 2 }, { 1, 2, 1 } };
                 matconvolution = tab;
             }
             if (choix == 5)
+            {
+                int[,] tab = { { -2, -1, 0 }, { -1, 1, 1 }, { 0, 1, 2 } };
+                matconvolution = tab;
+            }
+            if (choix == 6)
             {
                 int[,] tab = { { 0, -1, 0 }, { -1, 5, -1 }, { 0, -1, 0 } };
                 matconvolution = tab;
