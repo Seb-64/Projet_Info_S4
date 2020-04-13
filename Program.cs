@@ -38,11 +38,11 @@ namespace Projet_Info_S4
                   }
                   Console.WriteLine();
               }*/
-            MyImage image = new MyImage("Image\\lena.bmp");
+            MyImage image = new MyImage("Image\\lac.bmp");
             //Process.Start("Image\\lac.bmp");
-            image.Couleur_To_Nuance_Gris();
+            image.Effet_Miroir();
             image.From_Image_To_File();
-            //Process.Start("D:\\Program Files\\One Drive - De Vinci\\OneDrive - De Vinci\\ESILV\\Algorithme et C#\\WPF_PSI_S4\\lac_copie.bmp");
+            Process.Start("Image\\lac_copie.bmp");
             //Console.ReadKey();
         }
     }
