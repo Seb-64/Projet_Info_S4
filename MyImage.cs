@@ -22,6 +22,7 @@ namespace Projet_Info_S4
         private int largeur;
         private int nbBitsCouleur;
         private Pixel[,] image;
+
         //Constructeurs
         public MyImage(string nomFichier)
         {
@@ -48,7 +49,7 @@ namespace Projet_Info_S4
                 {
                     for (int colonne = 0; colonne < largeur; colonne++)
                     {
-                        this.image[ligne, colonne] = new Pixel(fichier[k], fichier[k + 1], fichier[k + 2]);
+                        this.image[ligne, colonne] = new Pixel(fichier[k + 2], fichier[k + 1], fichier[k]);
                         k += 3;
                     }
                 }
@@ -57,7 +58,7 @@ namespace Projet_Info_S4
         }
         public MyImage(MyImage aCopier)
         {
-            this.nomFichier = aCopier.nomFichier.Insert(6, "copie.");
+            this.nomFichier = aCopier.nomFichier.Replace(".bmp", "_copie.bmp");
             this.type = aCopier.type;
             this.tailleFichier = aCopier.tailleFichier;
             this.tailleOffset = aCopier.tailleOffset;
@@ -139,9 +140,9 @@ namespace Projet_Info_S4
             {
                 for (int c = 0; c < this.largeur; c++)
                 {
-                    fichier[t] = this.image[l, c].R;    //on attribue les octets des pixel R, G et B à la matrice de byte
+                    fichier[t] = this.image[l, c].B;    //on attribue les octets des pixel R, G et B à la matrice de byte
                     fichier[t + 1] = this.image[l, c].G;
-                    fichier[t + 2] = this.image[l, c].B;
+                    fichier[t + 2] = this.image[l, c].R;
                     t += 3;
                 }
             }
@@ -291,45 +292,65 @@ namespace Projet_Info_S4
             this.image = imageRetreci;
 
         }
-        public void Rotation(int angle)
+        public MyImage Rotation(int angle)
         {
-            double teta = angle * Math.PI / 180;
+            MyImage rotation = new MyImage();
+            int diagonale = (int)Math.Sqrt(largeur * largeur + hauteur * hauteur);
+            Pixel[,] rota = new Pixel[diagonale + 10, diagonale + 10];
+            rotation.nomFichier = "Images\\rotation.bmp";
+            rotation.type = "BM";
+            rotation.tailleFichier = diagonale * diagonale * 24 + 54;
+            rotation.tailleOffset = 54;
+            rotation.nbBitsCouleur = 24;
 
-            int newLargeur = Convert.ToInt32(this.largeur * Math.Cos(teta) + this.hauteur * Math.Sin(teta));
-            int newHauteur = Convert.ToInt32(this.largeur * Math.Sin(teta) + this.hauteur * Math.Cos(teta));
-            int newTailleFichier = newHauteur * newLargeur;
-            byte[] fichier = new byte[newTailleFichier];
-            for (int i = 0; i < 54; i++)
+            for (int i = 0; i < diagonale; i++)
             {
-                fichier[i] = (byte)0; //on attribut tout d'abord une valeur aux header et header info
+                for (int j = 0; j < diagonale; j++)
+                {
+                    rota[i, j] = new Pixel(255, 255, 255);
+                }
             }
 
-            byte[] tabType = { Convert.ToByte(this.type[0]), Convert.ToByte(this.type[1]) };
-            fichier[0] = tabType[0]; fichier[1] = tabType[1];
-            byte[] tabTaille = Convertir_Int_To_Endian(newTailleFichier);
-            fichier[2] = tabTaille[0]; fichier[3] = tabTaille[1]; fichier[4] = tabTaille[2]; fichier[5] = tabTaille[3];
-            byte[] tabTailleOffset = Convertir_Int_To_Endian(this.tailleOffset);
-            fichier[10] = tabTailleOffset[0]; fichier[11] = tabTailleOffset[1]; fichier[12] = tabTailleOffset[2]; fichier[13] = tabTailleOffset[3];
-            fichier[14] = 40;
-            byte[] tabLargeur = Convertir_Int_To_Endian(newLargeur);
-            fichier[18] = tabLargeur[0]; fichier[19] = tabLargeur[1]; fichier[20] = tabLargeur[2]; fichier[21] = tabLargeur[3];
-            byte[] tabHauteur = Convertir_Int_To_Endian(newHauteur);
-            fichier[22] = tabHauteur[0]; fichier[23] = tabHauteur[1]; fichier[24] = tabHauteur[2]; fichier[25] = tabHauteur[3];
-            byte[] tabNbrBitCouleur = Convertir_Int_To_Endian(this.nbBitsCouleur);
-            fichier[28] = tabNbrBitCouleur[0]; fichier[29] = tabNbrBitCouleur[1];
-
-            int t = 54;
-            /*Pas encore trouvé comment faire tourner l'image
-            for (int l = 0; l < this.hauteur; l++)
+            for (int i = 0; i < hauteur; i++)
             {
-                for (int c = 0; c < this.largeur; c++)
+                for (int j = 0; j < largeur; j++)
                 {
-                    fichier[t CHANGEMENT] = this.image[l, c].R;    //on attribue les octets des pixel R, G et B à la matrice de byte
-                    fichier[t + 1 CHANGEMENT] = this.image[l, c].G;
-                    fichier[t + 2 CHANGEMENT] = this.image[l, c].B;
-                    t += 3;
+                    int[] tab = new int[2];
+                    tab = Rot(largeur / 2 - j, hauteur / 2 - i, angle);
+
+                    if (tab[1] < diagonale / 2 && tab[0] < diagonale / 2)
+                    {
+                        rota[diagonale / 2 - tab[1], diagonale / 2 - tab[0]] = image[i, j];
+                    }
+                    else if (tab[1] < diagonale / 2 && tab[0] >= diagonale / 2)
+                    {
+                        rota[diagonale / 2 - tab[1], tab[0] - diagonale / 2] = image[i, j];
+                    }
+                    else if (tab[1] >= diagonale / 2 && tab[0] < diagonale / 2)
+                    {
+                        rota[tab[1] - diagonale / 2, diagonale / 2 - tab[0]] = image[i, j];
+                    }
+                    else if (tab[1] >= diagonale / 2 && tab[0] >= diagonale / 2)
+                    {
+                        rota[tab[1] - diagonale / 2, tab[0] - diagonale / 2] = image[i, j];
+                    }
                 }
-            }*/
+            }
+            rotation.hauteur = diagonale;
+            rotation.largeur = diagonale;
+            rotation.image = rota;
+            return rotation;
+        }
+        private int[] Rot(int x, int y, double angle)
+        {
+            int[] tab = new int[2];
+            angle *= Math.PI / 180;
+            x += (int)(-y * Math.Tan(angle / 2));
+            y += (int)(x * Math.Sin(angle));
+            x += (int)(-y * Math.Tan(angle / 2));
+            tab[0] = x;
+            tab[1] = y;
+            return tab;
         }
         /// <summary>
         /// Matrice de convolution qui applique plusieurs filtre à une image
@@ -435,6 +456,153 @@ namespace Projet_Info_S4
                 }
             }
             this.image = matricefinale;
+        }
+        /// <summary>
+        /// Fonction qui créer une image fractale, dans notre cas l'ensemble de Mandelbrot
+        /// </summary>
+        public void Fractale()
+        {
+            int hgt = this.largeur;
+            int wid = this.hauteur;
+            double dc_r = (0.6 - (-2.1)) / (wid - 1);
+            double dc_i = (1.2 - (-1.2)) / (hgt - 1);
+
+            double c_r = -2.1;
+            for (int i = 0; i < wid; i++)
+            {
+                double c_i = -1.2;
+                for (int j = 0; j < hgt; j++)
+                {
+                    double z_r = 0;
+                    double z_i = 0;
+                    double z2_r = 0;
+                    double z2_i = 0;
+                    int clr = 1;
+                    while ((clr <= 50) && (z2_r + z2_i < 4))
+                    {
+                        z2_r = z_r * z_r;
+                        z2_i = z_i * z_i;
+                        z_i = 2 * z_i * z_r + c_i;
+                        z_r = z2_r - z2_i + c_r;
+                        clr++;
+                    }
+
+                    if (clr > 50) { image[i, j].R = image[i, j].G = image[i, j].B = 0; }
+                    else { image[i, j].R = image[i, j].G = image[i, j].B = 255; }
+
+                    c_i += dc_i;
+                }
+                c_r += dc_r;
+            }
+        }
+        /// <summary>
+        /// Fonction statique qui créer d'abord une instance de MyImage null puis on donne à tout ses attributs les valeurs pour définir une image Bitmap.
+        /// Ensuite, avec la hauteur et la largeur rentrées en paramètre, on calcule la taille du fichier et on créer une matrice de pixel noir de la taille de l'image.
+        /// </summary>
+        /// <param name="hauteur">Hauteur de l'image</param>
+        /// <param name="largeur">Largeur de l'image</param>
+        /// <returns>Nouvelle image Bitmap noir de taille hauteur*largeur</returns>
+        public static MyImage CréerMyImage(int hauteur, int largeur)
+        {
+            MyImage image = new MyImage();
+            image.nomFichier = "Images\\nouvelle_image.bmp";
+            image.type = "BM";
+            image.tailleFichier = hauteur * largeur * 24 + 54;
+            image.tailleOffset = 54;
+            image.hauteur = hauteur;
+            image.largeur = largeur;
+            image.nbBitsCouleur = 24;
+            image.image = new Pixel[hauteur, largeur];
+
+            for (int i = 0; i < hauteur; i++)
+            {
+                for (int j = 0; j < largeur; j++)
+                {
+                    image.image[i, j] = new Pixel(0, 0, 0);
+                }
+            }
+            return image;
+        }
+        public MyImage Histogramme()
+        {
+            MyImage histo = new MyImage();
+            histo.hauteur = 768;
+            histo.largeur = 256;
+            Pixel[,] histogramme = new Pixel[768, 256];
+
+            int[] tabHistoR = new int[256];
+            int[] tabHistoG = new int[256];
+            int[] tabHistoB = new int[256];
+
+            int compteurR = 0;
+            int compteurG = 0;
+            int compteurB = 0;
+            int valMax = 0;
+
+            for (int i = 0; i < 256; i++)
+            {
+                for (int j = 0; j < this.hauteur; j++)
+                {
+                    for (int k = 0; k < this.largeur; k++)
+                    {
+                        if (image[j, k].R == i) compteurR++;
+                        if (image[j, k].G == i) compteurG++;
+                        if (image[j, k].B == i) compteurB++;
+                    }
+                }
+
+                if (compteurR > compteurG && compteurR > compteurB && compteurR > valMax) { valMax = compteurR; }
+                else if (compteurG > compteurR && compteurG > compteurB && compteurG > valMax) { valMax = compteurG; }
+                else if (compteurB > compteurR && compteurB > compteurG && compteurB > valMax) { valMax = compteurB; }
+
+                tabHistoR[i] = compteurR;
+                tabHistoG[i] = compteurG;
+                tabHistoB[i] = compteurB;
+
+                compteurR = 0;
+                compteurG = 0;
+                compteurB = 0;
+            }
+
+
+            for (int i = 0; i < 256; i++)
+            {
+                for (int ligne = 0; ligne < 256; ligne++)
+                {
+                    histogramme[ligne, i] = new Pixel(0, 0, 0);
+                    histogramme[ligne + 256, i] = new Pixel(0, 0, 0);
+                    histogramme[ligne + 512, i] = new Pixel(0, 0, 0);
+                    if (ligne < Map(tabHistoR[i], 0, valMax, 0, 256)) { histogramme[ligne, i].R = (byte)i; }
+                    else { histogramme[ligne, i].R = (byte)0; }
+                    if (ligne < Map(tabHistoG[i], 0, valMax, 0, 256)) { histogramme[ligne + 256, i].G = (byte)i; }
+                    else { histogramme[ligne + 256, i].G = (byte)0; }
+                    if (ligne < Map(tabHistoB[i], 0, valMax, 0, 256)) { histogramme[ligne + 512, i].B = (byte)i; }
+                    else { histogramme[ligne + 512, i].B = (byte)0; }
+                }
+            }
+
+            histo.nomFichier = "Images\\histogramme.bmp";
+            histo.type = "BM";
+            histo.tailleFichier = 768 * 256 * 24 + 54;
+            histo.tailleOffset = 54;
+            histo.nbBitsCouleur = 24;
+            histo.image = histogramme;
+
+            return histo;
+        }
+        /// <summary>
+        /// Fonction qui prend en entrée une valeur x, comprise entre in_min et in_max, et qui renvoie une valeur proportionnelle comrpise entre out_min et out_max
+        /// </summary>
+        /// <param name="x">variable entière à changer</param>
+        /// <param name="in_min">borne min entrée</param>
+        /// <param name="in_max">borne max entrée</param>
+        /// <param name="out_min">borne min sortie</param>
+        /// <param name="out_max">borne max sortie</param>
+        /// <returns></returns>
+        public int Map(int x, int in_min, int in_max, int out_min, int out_max)
+        {
+            if ((in_max - in_min) == 0) return x;
+            return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
         }
     }
 }
