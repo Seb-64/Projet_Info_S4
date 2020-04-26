@@ -17,6 +17,7 @@ namespace Projet_Info_S4
     {
         static void Main()
         {
+            #region Header BitMap
             /*byte[] fichier = File.ReadAllBytes("Images\\lac.bmp");
 
             Console.WriteLine("\n Header \n");
@@ -40,20 +41,23 @@ namespace Projet_Info_S4
                   }
                   Console.WriteLine();
               }*/
+            #endregion
+
             //MyImage image = MyImage.CréerMyImage(500,500);
-            MyImage image = new MyImage("Images\\lac.bmp");
+            MyImage image = new MyImage("Images\\coco.bmp");
+            MyImage aCopier = new MyImage("Images\\Code coco.bmp");
             //MyImage histo = image.Histogramme();
             //Process.Start("Image\\lac.bmp");
             //histo.Histogramme();
-            image = image.Rotation(-180);
+            image = image.Encoder2Images(aCopier);
             image.From_Image_To_File();
-            Process.Start("Images\\rotation_copie.bmp");
+            Process.Start("Images\\coco_encoder_copie.bmp");
 
             //Process.Start("Image\\lac_copie.bmp");
             //Console.ReadKey();
 
 
-
+            #region Reed-Solomon
             /*Encoding u8 = Encoding.UTF8;
             string a = "HELLO WORD";
             int iBC = u8.GetByteCount(a);
@@ -65,10 +69,10 @@ namespace Projet_Info_S4
             byte[] result = ReedSolomonAlgorithm.Encode(bytesa, 7, ErrorCorrectionCodeType.QRCode);
             byte[] result1 = ReedSolomonAlgorithm.Decode(bytesb, result);
             foreach (byte val in a) Console.Write(val + " ");
-            Console.WriteLine();
+            Console.WriteLine();*/
+            #endregion
 
-
-
+            /*
             QR test = new QR("HELLO WORLD");
             for(int i = 0; i < test.Donnees.Length-11; i+=11)
             {

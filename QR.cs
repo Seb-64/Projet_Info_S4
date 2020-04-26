@@ -185,7 +185,7 @@ namespace Projet_Info_S4
         }
         #endregion
 
-        //Méthodes
+        #region Méthodes
         public int[] Convertir_Int_To_nBit(int valeur, int nbBit)
         {
             int[] resultat = new int[nbBit];
@@ -200,5 +200,6 @@ namespace Projet_Info_S4
             }
             return resultat;
         }
+        #endregion
     }
 }

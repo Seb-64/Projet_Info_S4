@@ -13,7 +13,7 @@ namespace Projet_Info_S4
 {
     public class MyImage
     {
-        //Attributs
+        #region Attributs
         private string nomFichier;
         private string type;
         private int tailleFichier;
@@ -22,8 +22,9 @@ namespace Projet_Info_S4
         private int largeur;
         private int nbBitsCouleur;
         private Pixel[,] image;
+        #endregion
 
-        //Constructeurs
+        #region Constructeurs
         public MyImage(string nomFichier)
         {
             if (File.Exists(nomFichier))
@@ -68,8 +69,9 @@ namespace Projet_Info_S4
             this.image = aCopier.image;
         }
         public MyImage() { }
+        #endregion
 
-        //Méthode
+        #region Méthodes
         /// <summary>
         /// Cette fonction convertit un tableau d'octets de taille 4 au format little Endian en un nombre entier
         /// </summary>
@@ -523,6 +525,17 @@ namespace Projet_Info_S4
             }
             return image;
         }
+        /// <summary>
+        /// Création des histogrammes de couleur rouge, vert et bleu.
+        /// Tout d'abord on créer la nouvelle image sur laquelle va apparaître les 3 histogrammes, de 256 de large, qui correspond au nombre de possibilité d'intensité du pixel
+        /// et de 3x256=768 de hauteur : chaque histogramme tiendra dans un carré de 256 de côté.
+        /// On compte ensuite le nombre de pixel qui ont la même intensité de couleur entre 0 et 255 pour chacune des 3 couleurs.
+        /// On trouve laquelle de ces intensités entre toutes les couleurs est la plus grande pour ensuite faire une échelle par rapport à cette dernière.
+        /// Enfin on Map les valeurs d'intensités des couleurs, qui vont de 0 à la valeur max calculée précédemment, entre 0 et 256 grâce à la fonction Map.
+        /// Si la valeur retourné est supérieure à la ligne en construction, alors on change la valeur du pixel à la même valeur de la ligne pour construire l'histogramme.
+        /// Finalement, on retourne l'histogramme créé dans une imgae MyImage dans laquelle on a précisé tous ses attributs préalablement.
+        /// </summary>
+        /// <returns>Histogramme des 3 couleurs des pixels sur des carrés de 256x256</returns>
         public MyImage Histogramme()
         {
             MyImage histo = new MyImage();
@@ -563,8 +576,6 @@ namespace Projet_Info_S4
                 compteurG = 0;
                 compteurB = 0;
             }
-
-
             for (int i = 0; i < 256; i++)
             {
                 for (int ligne = 0; ligne < 256; ligne++)
@@ -581,7 +592,7 @@ namespace Projet_Info_S4
                 }
             }
 
-            histo.nomFichier = "Images\\histogramme.bmp";
+            histo.nomFichier = this.nomFichier.Replace(".bmp", "_histogramme.bmp");
             histo.type = "BM";
             histo.tailleFichier = 768 * 256 * 24 + 54;
             histo.tailleOffset = 54;
@@ -604,5 +615,77 @@ namespace Projet_Info_S4
             if ((in_max - in_min) == 0) return x;
             return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
         }
+        public MyImage Encoder2Images(MyImage imageACopier)
+        {
+            MyImage imageDansImage = new MyImage();
+            if (this.largeur >= imageACopier.largeur && this.hauteur >= imageACopier.hauteur)
+            {
+                imageDansImage.image = new Pixel[hauteur, largeur];
+                imageDansImage.type = "BM";
+                imageDansImage.tailleFichier = this.tailleFichier;
+                imageDansImage.tailleOffset = 54;
+                imageDansImage.nbBitsCouleur = 24;
+                imageDansImage.nomFichier = this.nomFichier.Replace(".bmp", "_encoder.bmp");
+                imageDansImage.hauteur = this.hauteur;
+                imageDansImage.largeur = this.largeur;
+                if (this.largeur == imageACopier.largeur && this.hauteur == imageACopier.hauteur)
+                {
+                    for (int i = 0; i < hauteur; i++)
+                    {
+                        for (int j = 0; j < largeur; j++)
+                        {
+                            imageDansImage.image[i, j] = new Pixel(0, 0, 0);
+
+                            int valeurR = this.image[i, j].R;
+                            int valeurG = this.image[i, j].G;
+                            int valeurB = this.image[i, j].B;
+                            int valeurRcopie = imageACopier.image[i, j].R;
+                            int valeurGcopie = imageACopier.image[i, j].G;
+                            int valeurBcopie = imageACopier.image[i, j].B;
+
+                            int[] bitR = Convertir_Int_To_nBit(valeurR, 8);
+                            int[] bitG = Convertir_Int_To_nBit(valeurG, 8);
+                            int[] bitB = Convertir_Int_To_nBit(valeurB, 8);
+                            int[] bitRcopie = Convertir_Int_To_nBit(valeurRcopie, 8);
+                            int[] bitGcopie = Convertir_Int_To_nBit(valeurGcopie, 8);
+                            int[] bitBcopie = Convertir_Int_To_nBit(valeurBcopie, 8);
+
+                            bitR[4] = bitRcopie[0]; bitR[5] = bitRcopie[1]; bitR[6] = bitRcopie[2]; bitR[7] = bitRcopie[3];
+                            bitG[4] = bitGcopie[0]; bitG[5] = bitGcopie[1]; bitG[6] = bitGcopie[2]; bitR[7] = bitGcopie[3];
+                            bitB[4] = bitBcopie[0]; bitB[5] = bitBcopie[1]; bitB[6] = bitBcopie[2]; bitR[7] = bitBcopie[3];
+
+                            imageDansImage.image[i, j].R = (byte)Convertir_nBit_To_Int(bitR, 8);
+                            imageDansImage.image[i, j].G = (byte)Convertir_nBit_To_Int(bitG, 8);
+                            imageDansImage.image[i, j].B = (byte)Convertir_nBit_To_Int(bitB, 8);
+                        }
+                    }
+                }
+            }
+            return imageDansImage;
+        }
+        public int[] Convertir_Int_To_nBit(int valeur, int nbBit)
+        {
+            int[] resultat = new int[nbBit];
+            long reste = 0;
+            long quotient = 0;
+            for (int i = 0; i < resultat.Length; i++)
+            {
+                quotient = valeur / Convert.ToInt64(Math.Pow(2, (nbBit - 1 - i)));
+                reste = valeur - quotient * Convert.ToInt64(Math.Pow(2, (nbBit - 1 - i)));
+                valeur = Convert.ToInt32(reste);
+                resultat[i] = (int)(quotient);
+            }
+            return resultat;
+        }
+        public int Convertir_nBit_To_Int(int[] valeur, int nbBit)
+        {
+            double result = 0;
+            for (int i = 0; i < valeur.Length; i++)
+            {
+                result += valeur[nbBit - 1 - i] * Math.Pow(2, i);
+            }
+            return Convert.ToInt32(result);
+        }
+        #endregion
     }
 }
